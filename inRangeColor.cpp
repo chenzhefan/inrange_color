@@ -1,42 +1,56 @@
-#include "car.h"
+#include <stdio.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <string>
+#include <time.h> 
+#include <opencv2/core/core.hpp>
+#include <opencv2/nonfree/nonfree.hpp>
+#include <opencv2/nonfree/features2d.hpp>
+#include <opencv2/legacy/legacy.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/ml/ml.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/gpu/gpu.hpp>
 
 
-//ÊäÈëÍ¼Ïñ  
+//è¾“å…¥å›¾åƒ  
 Mat img;
-//»Ò¶ÈÖµ¹éÒ»»¯  
+//ç°åº¦å€¼å½’ä¸€åŒ–  
 Mat bgr;
-//HSVÍ¼Ïñ  
+//HSVå›¾åƒ  
 Mat hsv;
-//É«Ïà  
+//è‰²ç›¸  
 int hmin = 0;
 int hmin_Max = 360;
 int hmax = 360;
 int hmax_Max = 360;
-//±¥ºÍ¶È  
+//é¥±å’Œåº¦  
 int smin = 0;
 int smin_Max = 255;
 int smax = 255;
 int smax_Max = 255;
-//ÁÁ¶È  
+//äº®åº¦  
 int vmin = 106;
 int vmin_Max = 255;
 int vmax = 250;
 int vmax_Max = 255;
-//ÏÔÊ¾Ô­Í¼µÄ´°¿Ú  
+//æ˜¾ç¤ºåŸå›¾çš„çª—å£  
 string windowName = "src";
-//Êä³öÍ¼ÏñµÄÏÔÊ¾´°¿Ú  
+//è¾“å‡ºå›¾åƒçš„æ˜¾ç¤ºçª—å£  
 string dstName = "dst";
-//Êä³öÍ¼Ïñ  
+//è¾“å‡ºå›¾åƒ  
 Mat dst;
-//»Øµ÷º¯Êı  
+//å›è°ƒå‡½æ•°  
 void callBack(int, void*)
 {
-	//Êä³öÍ¼Ïñ·ÖÅäÄÚ´æ  
+	//è¾“å‡ºå›¾åƒåˆ†é…å†…å­˜  
 	dst = Mat::zeros(img.size(), CV_32FC3);
-	//ÑÚÂë  
+	//æ©ç   
 	Mat mask;
 	inRange(hsv, Scalar(hmin, smin / float(smin_Max), vmin / float(vmin_Max)), Scalar(hmax, smax / float(smax_Max), vmax / float(vmax_Max)), mask);
-	//Ö»±£Áô  
+	//åªä¿ç•™  
 	for (int r = 0; r < bgr.rows; r++)
 	{
 		for (int c = 0; c < bgr.cols; c++)
@@ -47,35 +61,35 @@ void callBack(int, void*)
 			}
 		}
 	}
-	//Êä³öÍ¼Ïñ  
+	//è¾“å‡ºå›¾åƒ  
 	imshow(dstName, dst);
-	//±£´æÍ¼Ïñ  
+	//ä¿å­˜å›¾åƒ  
 	dst.convertTo(dst, CV_8UC3, 255.0, 0);
 	imwrite("HSV_inRange.jpg", dst);
 }
-void test_main()
+int main()
 {
-	//ÊäÈëÍ¼Ïñ  
-	img = imread("E:\\ËØ²ÄÍ¼Æ¬\\1.png",1);
+	//è¾“å…¥å›¾åƒ  
+	img = imread("E:\\ç´ æå›¾ç‰‡\\1.png",1);
 	if (!img.data || img.channels() != 3)
 		return ;
 	imshow(windowName, img);
-	//²ÊÉ«Í¼ÏñµÄ»Ò¶ÈÖµ¹éÒ»»¯  
+	//å½©è‰²å›¾åƒçš„ç°åº¦å€¼å½’ä¸€åŒ–  
 	img.convertTo(bgr, CV_32FC3, 1.0 / 255, 0);
-	//ÑÕÉ«¿Õ¼ä×ª»»  
+	//é¢œè‰²ç©ºé—´è½¬æ¢  
 	cvtColor(bgr, hsv, COLOR_BGR2HSV);
-	//¶¨ÒåÊä³öÍ¼ÏñµÄÏÔÊ¾´°¿Ú  
+	//å®šä¹‰è¾“å‡ºå›¾åƒçš„æ˜¾ç¤ºçª—å£  
 	namedWindow(dstName, WINDOW_NORMAL);
-	//µ÷½ÚÉ«Ïà H  
+	//è°ƒèŠ‚è‰²ç›¸ H  
 	createTrackbar("hmin", dstName, &hmin, hmin_Max, callBack);
 	createTrackbar("hmax", dstName, &hmax, hmax_Max, callBack);
-	//µ÷½Ú±¥ºÍ¶È S  
+	//è°ƒèŠ‚é¥±å’Œåº¦ S  
 	createTrackbar("smin", dstName, &smin, smin_Max, callBack);
 	createTrackbar("smax", dstName, &smax, smax_Max, callBack);
-	//µ÷½ÚÁÁ¶È V  
+	//è°ƒèŠ‚äº®åº¦ V  
 	createTrackbar("vmin", dstName, &vmin, vmin_Max, callBack);
 	createTrackbar("vmax", dstName, &vmax, vmax_Max, callBack);
 	callBack(0, 0);
 	waitKey(0);
-	return;
+	return 0;
 }
